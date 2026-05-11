@@ -1,5 +1,7 @@
 
-
+Datos de acceso creados:
+Admin: admin@planta.com / admin123
+Supervisor: supervisor@planta.com / super123
 
 #PARA CREAR EL PROEYCTO DESDE CERO OTRA VEZ EN OTRA MAQUINA O EN LA MISMA MAQUINA:
 

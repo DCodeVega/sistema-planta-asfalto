@@ -10,6 +10,7 @@ use App\Models\DetalleIngreso;
 use App\Models\Funcionario;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -53,6 +54,22 @@ class DatabaseSeeder extends Seeder
         Funcionario::insert([
             ['id_funcionario' => 201, 'nombre' => 'Carlos Mamani', 'cargo' => 'Responsable de Planta', 'area' => 'Unidad Mantenimiento'],
             ['id_funcionario' => 202, 'nombre' => 'Lucia Fernandez', 'cargo' => 'Operador de Planta', 'area' => 'Producción Asfáltica'],
+        ]);
+
+        // Crear admin
+        User::create([
+            'name' => 'Administrador',
+            'email' => 'admin@planta.com',
+            'password' => Hash::make('admin123'),
+            'rol' => 'admin',
+        ]);
+
+        // Crear supervisor
+        User::create([
+            'name' => 'Supervisor',
+            'email' => 'supervisor@planta.com',
+            'password' => Hash::make('super123'),
+            'rol' => 'supervisor',
         ]);
     }
 }

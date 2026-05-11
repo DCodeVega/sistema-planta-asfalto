@@ -1,13 +1,17 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+const isAdmin = computed(() => user.value?.rol === 'admin');
 </script>
 
 <template>
@@ -39,6 +43,33 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
+
+                                <!-- Enlaces para Supervisor y Admin -->
+                                <NavLink :href="route('ingresos.index')" :active="route().current('ingresos.*')">
+                                    Ingresos
+                                </NavLink>
+                                <NavLink :href="route('salidas.index')" :active="route().current('salidas.*')">
+                                    Salidas
+                                </NavLink>
+                                <NavLink :href="route('reportes.index')" :active="route().current('reportes.*')">
+                                    Reportes
+                                </NavLink>
+
+                                <!-- Solo Admin -->
+                                <template v-if="isAdmin">
+                                    <NavLink :href="route('materiales.index')" :active="route().current('materiales.*')">
+                                        Materiales
+                                    </NavLink>
+                                    <NavLink :href="route('proyectos.index')" :active="route().current('proyectos.*')">
+                                        Proyectos
+                                    </NavLink>
+                                    <NavLink :href="route('funcionarios.index')" :active="route().current('funcionarios.*')">
+                                        Funcionarios
+                                    </NavLink>
+                                    <NavLink :href="route('usuarios.index')" :active="route().current('usuarios.*')">
+                                        Usuarios
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 
@@ -146,6 +177,32 @@ const showingNavigationDropdown = ref(false);
                         >
                             Dashboard
                         </ResponsiveNavLink>
+
+                        <!-- Enlaces Responsivos -->
+                        <ResponsiveNavLink :href="route('ingresos.index')" :active="route().current('ingresos.*')">
+                            Ingresos
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('salidas.index')" :active="route().current('salidas.*')">
+                            Salidas
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('reportes.index')" :active="route().current('reportes.*')">
+                            Reportes
+                        </ResponsiveNavLink>
+
+                        <template v-if="isAdmin">
+                            <ResponsiveNavLink :href="route('materiales.index')" :active="route().current('materiales.*')">
+                                Materiales
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('proyectos.index')" :active="route().current('proyectos.*')">
+                                Proyectos
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('funcionarios.index')" :active="route().current('funcionarios.*')">
+                                Funcionarios
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('usuarios.index')" :active="route().current('usuarios.*')">
+                                Usuarios
+                            </ResponsiveNavLink>
+                        </template>
                     </div>
 
                     <!-- Responsive Settings Options -->
