@@ -1,0 +1,100 @@
+
+
+
+#PARA CREAR EL PROEYCTO DESDE CERO OTRA VEZ EN OTRA MAQUINA O EN LA MISMA MAQUINA:
+
+composer create-project laravel/laravel sistema-planta-asfalto
+cd sistema-planta-asfalto
+
+# Requerir las dependencias de Inertia, Vue y Tailwind
+composer require inertiajs/inertia-laravel
+composer require laravel/breeze # Para autenticación y scaffolding
+
+# Instalar Breeze con Inertia+Vue
+php artisan breeze:install vue
+
+# Instalar dependencias NPM
+npm install
+
+# Instalar Tailwind CSS (ya viene con Breeze, pero verificamos)
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+---------------------------------------AL INICIAR Y ACTUALIZAR EL REPOSITORIO PREVIO -------------------------------------
+# 1. Clonar el repositorio (solo la primera vez)
+git clone https://github.com/usuario-compañero/proyecto.git
+
+# 2. Entrar a la carpeta del proyecto
+cd proyecto
+
+# 3. Actualizar toda la información remota
+git fetch origin
+
+# 4. Ver todas las ramas disponibles (locales y remotas)
+git branch -a
+
+# 5. Traer la rama en la que estabas trabajando
+git checkout feature/proy_v1.1   # <- tu rama
+
+# 6. Verificar que estás en la rama correcta
+git branch
+# Deberías ver: * feature/proy_v1.1
+
+---------------------------------------DESPUES DE TERMINAR Y GUARDAR LOS CAMBIOS-------------------------------------
+# 1. Guardar tus cambios
+git add .
+git commit -m "feat: avancé X cosa desde laptop"
+
+# 2. Subir los cambios a GitHub
+git push origin feature/proy_v1.1
+
+---------------------------------------PASOS PARA INICIAR EL PROYECTO EN VISUAL STUDIO CODE-------------------------------------
+# crear el enlace del servidor local
+php artisan serve
+
+# crear el .env (ya que el github no sube el original ".env" pero si el ".env.example" de ahi copia todo al ".env)
+
+#para el composer antes de ejecutar el proyecto laravel 12 tienes que tener el composer y paquetes instalados correctamente
+composer install
+
+#problemas de KeyException: suele ser por el hash que no tenia el ".env" ejecuta el siguiente codigo para solcionar:
+php artisan key:generate
+
+#actualizar la base de datos en phpMyAdmin:
+
+Comando	                        ¿Qué hace?	                                    ¿Cuándo usarlo?
+php artisan migrate	            Ejecuta migraciones pendientes	                Uso diario normal
+php artisan migrate:fresh	    Borra TODAS las tablas y las recrea desde cero	Cuando quieres empezar limpio
+php artisan migrate:refresh	    Rollback + migrate (borra y recrea)	            Similar a fresh, pero ejecuta seeders
+php artisan migrate:reset	    Borra todas las migraciones	                    Limpiar todo
+php artisan migrate:status	    Muestra estado de migraciones	                Ver qué falta
+php artisan migrate:rollback	Deshace la última migración	                    Si cometiste un error
+
+#orden de las ejecuciones de las migraciones:
+
+php artisan make:migration create_careers_table *
+php artisan make:migration_create_users_table   *
+php artisan make:migration create_posts_table
+php artisan make:migration create_comments_table
+php artisan make:migration create_reactions_table
+php artisan make:migration create_reports_table
+php artisan make:migration create_post_modifications_table
+php artisan make:migration create_master_activities_table
+php artisan make:migration create_master_requests_table
+php artisan make:migration create_password_reset_codes_table
+
+#ingresar datos a las tablas 
+php artisan db:seed
+
+#instalar paquetes de Cloudinary API para imagenes del proyecto
+composer require cloudinary/cloudinary_php
+composer dump-autoload
+php artisan config:clear
+php artisan cache:clear
+
+
+Comando	¿Qué hace?	¿Se queda ejecutando?	¿Cuándo usar?
+npm run dev	    : Compila UNA VEZ y se detiene	❌ No	Cuando solo quieres compilar una vez
+npm run watch	: Compila Y OBSERVA cambios continuamente	✅ Sí (hasta que lo detengas)	Mientras desarrollas (recomendado)
+cmd /c npm start: ejecutar el NPM como administrador
+cmd /c npm run dev : ejecutar el dev como administrador
+cmd /c npm run watch : ejecutar el watch como administrador
