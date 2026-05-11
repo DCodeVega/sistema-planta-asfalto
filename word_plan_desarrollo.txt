@@ -1,0 +1,104 @@
+📌 PLAN DE DESARROLLO – SISTEMA DE CONTROL DE MATERIALES
+Tecnología: Laravel 12 + Inertia.js + Vue.js + Tailwind CSS
+Base de datos: Modelo con detalle_ingreso / detalle_salida (ya creado)
+
+✅ Hito 0: Preparación del entorno (ya deberías tenerlo)
+0.1 Laravel instalado y funcionando (php artisan serve)
+
+0.2 Dependencias Node instaladas (npm install)
+
+0.3 Vite + Tailwind + Inertia configurados
+
+0.4 Archivo .env con conexión a BD correcta
+
+0.5 Migraciones y seeders ejecutados (tablas con datos de ejemplo)
+
+0.6 Git iniciado y repositorio remoto vinculado
+
+🧱 Hito 1: Autenticación y layout base (días 1-2)
+Objetivo: Tener login funcional y una estructura de menú que distinga roles.
+
+#	Tarea	Archivos clave	Criterio de éxito
+1.1	Instalar Laravel Breeze con Inertia+Vue	composer require laravel/breeze, php artisan breeze:install vue	Aparece la pantalla de login y registro
+1.2	Agregar campo rol a tabla users (migración)	Migración add_rol_to_users_table	rol tipo enum('admin','supervisor')
+1.3	Modificar UserSeeder para crear admin y supervisor	database/seeders/UserSeeder.php	Al ejecutar db:seed existen ambos usuarios
+1.4	Crear middleware CheckRole	php artisan make:middleware CheckRole	Redirige si el usuario no tiene el rol adecuado
+1.5	Ajustar layout principal (AppLayout.vue) con menú dinámico	resources/js/Layouts/AppLayout.vue	El menú muestra opciones según rol (admin ve más)
+1.6	Proteger rutas: grupo con middleware auth y role	routes/web.php	Acceso a /dashboard solo con login
+Prueba: Iniciar sesión como admin y como supervisor; verificar que el menú cambia.
+
+🗂️ Hito 2: CRUD de Materiales y Unidades de Medida (días 3-4)
+Objetivo: Administrar catálogos básicos (solo admin).
+
+#	Tarea	Archivos clave	Criterio de éxito
+2.1	Crear modelo UnidadMedida y su migración (si no existe)	app/Models/UnidadMedida.php	Tabla unidad_medida con id_medida, nombre
+2.2	Crear modelo Material con relación a UnidadMedida	app/Models/Material.php	belongsTo(UnidadMedida::class)
+2.3	Crear controlador MaterialController (con métodos index, store, update, destroy)	app/Http/Controllers/MaterialController.php	Usa Inertia::render('Materiales/Index')
+2.4	Crear vistas Vue: Index.vue (lista con tabla + botón nuevo), Form.vue (modal o página)	resources/js/Pages/Materiales/Index.vue	Listado paginado, botón crear, editar, eliminar
+2.5	Agregar validaciones (nombre requerido, unidad existente)	Formulario Vue + Request	No se guardan datos inválidos
+2.6	Sembrar unidades de medida básicas (KG, LITRO, M3, UNIDAD)	Seeder	Desplegable con opciones
+Prueba: Admin puede crear, editar y eliminar materiales. Supervisor no ve el menú de materiales.
+
+🏗️ Hito 3: CRUD de Proyectos (días 5-6)
+Objetivo: Gestionar proyectos (solo admin, pero supervisor puede ver listado).
+
+#	Tarea	Archivos clave	Criterio de éxito
+3.1	Modelo Proyecto (aunque en el modelo actual el proyecto es un campo texto en ingreso, pero para normalizar conviene tabla proyectos)	Aclaración: Tu diseño actual tiene proyecto como columna en ingreso. Para evitar duplicación, crea tabla proyectos y relaciona ingreso.proyecto_id → proyectos.id. ¿Hacemos ese cambio? Es recomendable. Si no, lo dejamos como texto libre. Dime qué prefieres.	
+3.2	Controlador ProyectoController	CRUD completo	
+3.3	Vistas Vue para lista y formulario		
+3.4	Seeders con proyectos de ejemplo		
+Si decides mantener proyecto como texto libre en ingreso, entonces solo necesitas un listado simple de proyectos (SELECT DISTINCT proyecto FROM ingresos) - pero eso es más limitado. Yo recomiendo migrar a tabla proyectos.
+
+📦 Hito 4: Registro de Ingresos (detalle_ingreso) (días 7-9)
+Objetivo: Permitir registrar un ingreso (cabecera + uno o más materiales).
+
+#	Tarea	Archivos clave	Criterio de éxito
+4.1	Modelos Ingreso y DetalleIngreso con relaciones	app/Models/Ingreso.php, DetalleIngreso.php	Ingreso hasMany DetalleIngreso
+4.2	Controlador IngresoController con métodos create, store	IngresoController.php	Almacena cabecera y detalles en transacción
+4.3	Vista Vue: formulario dinámico con campos de materiales (puede añadir filas)	resources/js/Pages/Ingresos/Create.vue	Permite agregar múltiples materiales al mismo ingreso
+4.4	Selector de proyecto (si es tabla proyectos) o campo texto		
+4.5	Validación: cantidad_adquirida > 0, fechas válidas		
+4.6	Listado de ingresos (index) con paginación	Ingresos/Index.vue	Muestra fecha, proyecto, ODC, y botón ver detalles
+Prueba: Registrar un ingreso con dos materiales. Verificar en BD que se crearon registros en ingreso y detalle_ingreso.
+
+🚚 Hito 5: Registro de Salidas (detalle_salida) (días 10-12)
+Objetivo: Registrar salida de material, consumiendo de lotes específicos (detalle_ingreso) y validando stock.
+
+#	Tarea	Archivos clave	Criterio de éxito
+5.1	Modelos Salida y DetalleSalida	app/Models/Salida.php, DetalleSalida.php	Relaciones: Salida belongsTo Funcionario, DetalleSalida belongsTo DetalleIngreso
+5.2	Controlador SalidaController con create (muestra lotes disponibles) y store		
+5.3	Vista Vue: formulario de salida. Al seleccionar un material, mostrar lotes (detalle_ingreso) con su stock disponible	Usar API endpoint para obtener lotes por material	El usuario elige de qué lote sacar (o múltiples lotes)
+5.4	Validación: cantidad_salida no excede stock del lote	Backend + frontend	Mensaje de error si stock insuficiente
+5.5	Listado de salidas (index)		Muestra fecha, funcionario, uso, y los materiales/lotes consumidos
+5.6	Relacionar Salida con Funcionario (selector de funcionarios)	CRUD de funcionarios (puede ser hito aparte)	
+Prueba: Registrar una salida que consuma parcialmente un lote. Verificar que el stock restante se calcula correctamente.
+
+📄 Hito 6: Reporte Imprimible (días 13-15)
+Objetivo: Generar reporte con el formato del PDF, filtrando por proyecto y fechas.
+
+#	Tarea	Archivos clave	Criterio de éxito
+6.1	Ruta y controlador ReporteController	php artisan make:controller ReporteController	Método index y generar
+6.2	Vista Vue: formulario con select de proyecto y rango de fechas	resources/js/Pages/Reporte/Index.vue	
+6.3	Consulta SQL/Query Builder que agrupe por material y lote, calcule total ingresado, salido, stock	Usar joins entre detalle_ingreso, detalle_salida, material, unidad_medida	La tabla debe mostrar las columnas exactas del PDF
+6.4	Pasar datos a la vista y mostrarlos en tabla		
+6.5	Botón "Imprimir" que use window.print() y CSS @media print		Al imprimir, oculta menús y botones, solo tabla
+6.6	Prueba con datos reales (seeders con los ejemplos del PDF)		El resultado debe coincidir con el ejemplo (Cemento Asfáltico: ingresado 74250, salido 73750, stock 500)
+🧪 Hito 7: Pruebas y despliegue (días 16-20)
+Objetivo: Asegurar calidad y publicar en hosting gratuito.
+
+#	Tarea	Detalle
+7.1	Escribir pruebas unitarias (PHPUnit)	Modelos, cálculo de stock, validaciones
+7.2	Pruebas de integración (Postman + Newman)	Colección de requests para cada endpoint
+7.3	Pruebas E2E (Laravel Dusk)	Flujo: login → crear ingreso → crear salida → ver reporte
+7.4	Prueba de usabilidad con supervisor	Mostrar al Ing. Diego, tomar feedback
+7.5	Preparar entorno de producción (Railway o Render)	Variables de entorno, migraciones, assets
+7.6	Desplegar aplicación	Obtener URL pública con HTTPS
+7.7	Documentación: README, manual de usuario	Capturas de pantalla, pasos de instalación
+🧭 ¿Cómo usar este plan?
+No saltes de un hito a otro sin completar el anterior. Cada uno se basa en el previo.
+
+Después de cada tarea, haz commit a Git con un mensaje claro (ej: git commit -m "feat: add material CRUD with unit").
+
+Al final de cada hito, haz una prueba manual completa (o automatizada) antes de continuar.
+
+Si encuentras un error o duda, escríbeme exactamente qué tarea y qué mensaje de error sale. Lo resolvemos.
